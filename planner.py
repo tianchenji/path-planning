@@ -8,6 +8,7 @@
 # ---------------------------------------------------------------------------
 
 from casadi import *
+import numpy as np
 import matplotlib.pyplot as plt
 
 # The num of MPC actions, here include vx and vy
@@ -19,8 +20,8 @@ NUM_OF_STATES = 2
 NUM_OF_G_STATES = 1
 
 # MPC parameters
-lookahead_step_num = 20
-lookahead_step_timeinterval = 0.2
+lookahead_step_num = 25
+lookahead_step_timeinterval = 0.1
 
 # start point and end point
 start_point = [0, 0]
@@ -141,9 +142,15 @@ sol = mpc_.Solve(start_point)
 planned_px = sol['x'][0:1 * lookahead_step_num]
 planned_py = sol['x'][1 * lookahead_step_num:2 * lookahead_step_num]
 plt.plot(planned_px, planned_py, 'o-', label='planned trajectory')
+theta = np.arange(0, 2*np.pi, 0.01)
+danger_x = obstacle[0] + safety_r * np.cos(theta)
+danger_y = obstacle[1] + safety_r * np.sin(theta)
+plt.plot(danger_x, danger_y, 'r--', label='danger area')
 plt.plot(start_point[0], start_point[1], 'o', label='start point')
 plt.plot(end_point[0], end_point[1], 'o', label='target point')
-plt.plot(obstacle[0], obstacle[1], 'o', label='obstable')
+plt.plot(obstacle[0], obstacle[1], 'o', label='obstacle')
 plt.legend(loc='upper left')
+plt.axis([-0.1, 1.1, -0.1, 1.1])
+plt.axis('equal')
 print(sol['x'])
 plt.show()
