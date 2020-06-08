@@ -24,7 +24,7 @@ lookahead_step_num = 25
 lookahead_step_timeinterval = 0.1
 
 # start point and end point
-start_point = [0, 0]
+start_point = [0.0, 0.0]
 end_point = [1, 1]
 
 # obstacle coordinates
@@ -62,7 +62,7 @@ class MPC:
 		x_[self.first_state_index_.py] = state[1]
 
 		# penalty on states
-		for i in range(lookahead_step_num):
+		for i in range(lookahead_step_num - 1, lookahead_step_num):
 			cte = (x[self.first_state_index_.px + i] - end_point[0])**2 + (x[self.first_state_index_.py + i] - end_point[1])**2
 			cost += w_cte * cte
 		# penalty on inputs
@@ -130,7 +130,7 @@ class MPC:
 		opts["ipopt.print_level"] = 0
 		opts["print_time"] = 0
 
-		solver = nlpsol('solver', 'ipopt', nlp)
+		solver = nlpsol('solver', 'ipopt', nlp, opts)
 
 		# solve the NLP
 		res = solver(x0=x_, lbx=x_lowerbound_, ubx=x_upperbound_, lbg=g_lowerbound_, ubg=g_upperbound_)
@@ -139,18 +139,19 @@ class MPC:
 mpc_ = MPC()
 sol = mpc_.Solve(start_point)
 # plot results
+fig = plt.figure(figsize=(7, 7))
 planned_px = sol['x'][0:1 * lookahead_step_num]
 planned_py = sol['x'][1 * lookahead_step_num:2 * lookahead_step_num]
 plt.plot(planned_px, planned_py, 'o-', label='planned trajectory')
 theta = np.arange(0, 2*np.pi, 0.01)
-danger_x = obstacle[0] + safety_r * np.cos(theta)
-danger_y = obstacle[1] + safety_r * np.sin(theta)
+danger_x = obstacle[0] + (safety_r - 0.005) * np.cos(theta)
+danger_y = obstacle[1] + (safety_r - 0.005) * np.sin(theta)
 plt.plot(danger_x, danger_y, 'r--', label='danger area')
 plt.plot(start_point[0], start_point[1], 'o', label='start point')
 plt.plot(end_point[0], end_point[1], 'o', label='target point')
 plt.plot(obstacle[0], obstacle[1], 'o', label='obstacle')
 plt.legend(loc='upper left')
-plt.axis([-0.1, 1.1, -0.1, 1.1])
 plt.axis('equal')
-print(sol['x'])
+plt.axis([-0.1, 1.1, -0.1, 1.1])
+plt.grid()
 plt.show()
