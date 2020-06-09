@@ -23,3 +23,7 @@ Collision avoidance path planning project for robots.
 3. Call function `Solve(state, agent_state_pred)` repeatedly in your main loop. Arguments:
     * `state`: The current state of ego robot. This should be a 1-D list `[ego_x0, ego_y0]`.
     * `agent_state_pred`: The current state and predicted future states of surrounding agents. This should be a 3-D list `[[[agent_1_x0, agent_1_y0], [agent_1_x1, agent_1_y1], ...], [[agent_2_x0, agent_2_y0], [agent_2_x1, agent_2_y1], ...], ...]`. The shape of this list is determined by `num_of_agent` and `lookahead_step_num`.
+    
+4. Adjustable parameters in `MPC class`:
+    * `w_cte`: The larger, the faster ego robot moves towards the goal state.
+    * `w_dv`: The larger, the smoother ego robot trajectory is.
